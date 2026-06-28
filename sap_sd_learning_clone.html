@@ -1,0 +1,792 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--surface-0);color:var(--text-primary)}
+:root{--sap-blue:#0070f3;--sap-dark:#1a3a5c;--sap-light:#e8f4fd;--sap-border:#c0d8f0}
+
+.sap-shell{display:flex;flex-direction:column;height:100vh;min-height:600px;background:var(--surface-0)}
+.sap-header{background:#1a3a5c;color:#fff;display:flex;align-items:center;gap:12px;padding:0 16px;height:44px;flex-shrink:0}
+.sap-logo{font-weight:700;font-size:15px;letter-spacing:1px;color:#fff;padding:4px 10px;border:1.5px solid #5a8fc0;border-radius:4px}
+.sap-title{font-size:13px;color:#a8c8e8;flex:1}
+.sap-user{font-size:12px;color:#a8c8e8;display:flex;align-items:center;gap:8px}
+.sap-user i{font-size:16px}
+
+.sap-nav{background:#234e78;display:flex;gap:1px;padding:0 8px;flex-shrink:0;overflow-x:auto}
+.nav-item{font-size:12px;color:#8ab8d8;padding:8px 14px;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:all .15s}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,0.08)}
+.nav-item.active{color:#fff;border-bottom-color:#4db8ff}
+
+.sap-main{display:flex;flex:1;overflow:hidden}
+.sap-sidebar{width:220px;background:var(--surface-1);border-right:0.5px solid var(--border);overflow-y:auto;flex-shrink:0}
+.sidebar-section{border-bottom:0.5px solid var(--border)}
+.sidebar-header{font-size:11px;font-weight:500;color:var(--text-muted);padding:10px 12px 6px;text-transform:uppercase;letter-spacing:.5px}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:7px 12px;font-size:13px;cursor:pointer;color:var(--text-secondary);transition:all .15s}
+.sidebar-item:hover{background:var(--surface-0);color:var(--text-primary)}
+.sidebar-item.active{background:var(--bg-accent);color:var(--text-accent);font-weight:500}
+.sidebar-item i{font-size:15px;width:18px;text-align:center}
+
+.sap-content{flex:1;overflow-y:auto;padding:0}
+.content-area{display:none}
+.content-area.active{display:block}
+
+/* Dashboard */
+.dash-header{padding:20px 20px 12px;border-bottom:0.5px solid var(--border)}
+.dash-title{font-size:18px;font-weight:500}
+.dash-sub{font-size:13px;color:var(--text-muted);margin-top:2px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 20px}
+.kpi-card{background:var(--surface-1);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px}
+.kpi-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px}
+.kpi-val{font-size:22px;font-weight:500;margin:4px 0;color:var(--text-primary)}
+.kpi-trend{font-size:12px}
+.kpi-trend.up{color:var(--text-success)}
+.kpi-trend.down{color:var(--text-danger)}
+.section-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 20px 16px}
+.panel{background:var(--surface-1);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px}
+.panel-title{font-size:13px;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.mini-table{width:100%;font-size:12px;border-collapse:collapse}
+.mini-table th{color:var(--text-muted);font-weight:500;padding:4px 6px;text-align:left;border-bottom:0.5px solid var(--border)}
+.mini-table td{padding:5px 6px;border-bottom:0.5px solid var(--border);color:var(--text-secondary)}
+.mini-table tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:500}
+.badge.open{background:var(--bg-success);color:var(--text-success)}
+.badge.process{background:var(--bg-warning);color:var(--text-warning)}
+.badge.closed{background:var(--surface-0);color:var(--text-muted);border:0.5px solid var(--border)}
+.badge.blocked{background:var(--bg-danger);color:var(--text-danger)}
+
+/* Forms */
+.form-page{padding:20px}
+.form-toolbar{display:flex;align-items:center;gap:8px;padding:10px 20px;background:var(--surface-1);border-bottom:0.5px solid var(--border)}
+.btn{padding:6px 14px;font-size:13px;border:0.5px solid var(--border-strong);border-radius:var(--radius);background:var(--surface-2);color:var(--text-primary);cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans)}
+.btn:hover{background:var(--surface-1)}
+.btn.primary{background:var(--fill-accent);color:var(--on-accent);border-color:var(--fill-accent)}
+.btn.primary:hover{background:var(--fill-accent-hover)}
+.btn i{font-size:14px}
+.form-section{background:var(--surface-1);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:12px}
+.form-section-title{font-size:12px;font-weight:500;color:var(--text-muted);padding:10px 14px;border-bottom:0.5px solid var(--border);text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:6px}
+.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:14px}
+.form-field{display:flex;flex-direction:column;gap:4px}
+.form-field label{font-size:12px;color:var(--text-muted)}
+.form-field input,.form-field select,.form-field textarea{font-size:13px;padding:6px 10px;border:0.5px solid var(--border);border-radius:var(--radius);background:var(--surface-2);color:var(--text-primary);font-family:var(--font-sans);width:100%}
+.form-field input:focus,.form-field select:focus{outline:none;border-color:var(--fill-accent)}
+.form-field.span2{grid-column:span 2}
+.form-field.span3{grid-column:span 3}
+.items-table{width:100%;border-collapse:collapse;font-size:13px}
+.items-table th{background:var(--surface-0);color:var(--text-muted);font-weight:500;font-size:11px;padding:7px 10px;text-align:left;border-bottom:0.5px solid var(--border)}
+.items-table td{padding:7px 10px;border-bottom:0.5px solid var(--border);color:var(--text-primary)}
+.items-table tr:hover td{background:var(--surface-0)}
+.items-table input{width:100%;border:none;background:transparent;font-size:13px;color:var(--text-primary);font-family:var(--font-sans)}
+.items-table input:focus{outline:none;background:var(--bg-accent)}
+.amount-row{display:flex;justify-content:flex-end;gap:24px;padding:12px 14px;font-size:13px}
+.amount-row .total{font-weight:500;font-size:15px}
+.status-bar{display:flex;gap:24px;padding:10px 20px;background:var(--surface-0);border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text-muted)}
+.status-bar span{display:flex;align-items:center;gap:4px}
+.status-bar strong{color:var(--text-primary)}
+
+/* List view */
+.list-toolbar{display:flex;align-items:center;gap:8px;padding:10px 20px;border-bottom:0.5px solid var(--border)}
+.search-box{flex:1;max-width:280px;position:relative}
+.search-box input{width:100%;padding:6px 10px 6px 30px;border:0.5px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--surface-1);color:var(--text-primary);font-family:var(--font-sans)}
+.search-box i{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:14px}
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{background:var(--surface-1);color:var(--text-muted);font-weight:500;font-size:11px;padding:9px 14px;text-align:left;border-bottom:0.5px solid var(--border);position:sticky;top:0;cursor:pointer}
+.data-table th:hover{color:var(--text-primary)}
+.data-table td{padding:9px 14px;border-bottom:0.5px solid var(--border);color:var(--text-secondary)}
+.data-table tr:hover td{background:var(--surface-0);color:var(--text-primary);cursor:pointer}
+.table-wrap{overflow-x:auto;padding:0 20px 20px}
+
+/* Process flow */
+.flow-container{padding:20px}
+.flow-steps{display:flex;align-items:center;gap:0;margin:16px 0 24px;overflow-x:auto;padding:4px}
+.flow-step{display:flex;align-items:center;flex-direction:column;min-width:100px;position:relative;cursor:pointer}
+.flow-step-box{padding:8px 12px;border-radius:var(--radius);font-size:12px;font-weight:500;text-align:center;border:1.5px solid var(--border);background:var(--surface-1);color:var(--text-secondary);width:90px;transition:all .15s}
+.flow-step.done .flow-step-box{background:var(--bg-success);border-color:var(--border-success);color:var(--text-success)}
+.flow-step.active .flow-step-box{background:var(--bg-accent);border-color:var(--border-accent);color:var(--text-accent)}
+.flow-step.pending .flow-step-box{background:var(--surface-0);color:var(--text-muted)}
+.flow-step-num{width:20px;height:20px;border-radius:50%;background:var(--surface-0);border:1.5px solid var(--border);font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;margin-bottom:6px;color:var(--text-muted)}
+.flow-step.done .flow-step-num{background:var(--fill-success);border-color:var(--fill-success);color:#fff}
+.flow-step.active .flow-step-num{background:var(--fill-accent);border-color:var(--fill-accent);color:#fff}
+.flow-arrow{font-size:18px;color:var(--border-strong);margin:0 4px;margin-top:12px;flex-shrink:0}
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.info-card{background:var(--surface-1);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px}
+.info-card-title{font-size:12px;color:var(--text-muted);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.info-card p{font-size:13px;color:var(--text-secondary);line-height:1.5}
+
+/* Pricing / Conditions */
+.cond-table{width:100%;border-collapse:collapse;font-size:13px}
+.cond-table th{color:var(--text-muted);font-weight:500;font-size:11px;padding:8px 12px;text-align:left;border-bottom:0.5px solid var(--border);background:var(--surface-0)}
+.cond-table td{padding:8px 12px;border-bottom:0.5px solid var(--border);color:var(--text-secondary)}
+.cond-table tr.subtotal td{font-weight:500;color:var(--text-primary);background:var(--surface-0)}
+.cond-table tr.total td{font-weight:500;color:var(--text-accent);font-size:14px;background:var(--bg-accent)}
+
+/* Notification */
+.notif{position:fixed;bottom:16px;right:16px;padding:10px 16px;border-radius:var(--radius);background:var(--fill-accent);color:#fff;font-size:13px;font-weight:500;display:none;align-items:center;gap:8px;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.notif.show{display:flex}
+.notif i{font-size:16px}
+</style>
+
+<h2 class="sr-only">SAP Sales & Distribution learning environment — interactive ERP simulation</h2>
+
+<div class="sap-shell">
+  <div class="sap-header">
+    <div class="sap-logo">SAP</div>
+    <div class="sap-title">SAP S/4HANA — Sales & Distribution (SD) Learning Environment</div>
+    <div class="sap-user"><i class="ti ti-user-circle"></i> LEARNER01 | Client 100</div>
+  </div>
+  <div class="sap-nav" id="topNav">
+    <div class="nav-item active" onclick="switchModule('dashboard')">Home</div>
+    <div class="nav-item" onclick="switchModule('inquiry')">Pre-Sales</div>
+    <div class="nav-item" onclick="switchModule('order')">Sales Order</div>
+    <div class="nav-item" onclick="switchModule('delivery')">Shipping</div>
+    <div class="nav-item" onclick="switchModule('billing')">Billing</div>
+    <div class="nav-item" onclick="switchModule('pricing')">Pricing</div>
+    <div class="nav-item" onclick="switchModule('partner')">Partner Functions</div>
+    <div class="nav-item" onclick="switchModule('credit')">Credit Mgmt</div>
+    <div class="nav-item" onclick="switchModule('config')">Config</div>
+  </div>
+  <div class="sap-main">
+    <div class="sap-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-header">Master Data</div>
+        <div class="sidebar-item" onclick="gotoSection('customer')"><i class="ti ti-building"></i> Customer Master</div>
+        <div class="sidebar-item" onclick="gotoSection('material')"><i class="ti ti-box"></i> Material Master</div>
+        <div class="sidebar-item" onclick="gotoSection('pricing')"><i class="ti ti-tag"></i> Condition Records</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-header">Sales Process</div>
+        <div class="sidebar-item" onclick="switchModule('inquiry')"><i class="ti ti-file-description"></i> Inquiry (VA11)</div>
+        <div class="sidebar-item" onclick="gotoSection('quotation')"><i class="ti ti-file-invoice"></i> Quotation (VA21)</div>
+        <div class="sidebar-item active" onclick="switchModule('order')"><i class="ti ti-shopping-cart"></i> Sales Order (VA01)</div>
+        <div class="sidebar-item" onclick="switchModule('delivery')"><i class="ti ti-truck"></i> Delivery (VL01N)</div>
+        <div class="sidebar-item" onclick="switchModule('billing')"><i class="ti ti-receipt"></i> Billing (VF01)</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-header">Reports</div>
+        <div class="sidebar-item" onclick="gotoSection('report')"><i class="ti ti-chart-bar"></i> Sales Report (VA05)</div>
+        <div class="sidebar-item" onclick="gotoSection('backlog')"><i class="ti ti-list-check"></i> Order Backlog</div>
+      </div>
+    </div>
+
+    <div class="sap-content">
+
+      <!-- DASHBOARD -->
+      <div class="content-area active" id="area-dashboard">
+        <div class="dash-header">
+          <div class="dash-title">Sales Dashboard — July 2025</div>
+          <div class="dash-sub">Sales Organization: 1000 | Distribution Channel: 10 | Division: 00</div>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Open Orders</div>
+            <div class="kpi-val">142</div>
+            <div class="kpi-trend up"><i class="ti ti-trending-up"></i> +18 this week</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Revenue (MTD)</div>
+            <div class="kpi-val">€1.24M</div>
+            <div class="kpi-trend up"><i class="ti ti-trending-up"></i> 92% of target</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Pending Deliveries</div>
+            <div class="kpi-val">38</div>
+            <div class="kpi-trend down"><i class="ti ti-alert-circle"></i> 5 overdue</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Open Billing</div>
+            <div class="kpi-val">€284K</div>
+            <div class="kpi-trend down"><i class="ti ti-clock"></i> 12 invoices</div>
+          </div>
+        </div>
+        <div class="section-row">
+          <div class="panel">
+            <div class="panel-title"><i class="ti ti-shopping-cart" style="color:var(--text-accent)"></i> Recent Sales Orders</div>
+            <table class="mini-table">
+              <tr><th>Order #</th><th>Customer</th><th>Value</th><th>Status</th></tr>
+              <tr><td>100010</td><td>ACME GmbH</td><td>€14,500</td><td><span class="badge open">Open</span></td></tr>
+              <tr><td>100009</td><td>Delta AG</td><td>€8,200</td><td><span class="badge process">In Process</span></td></tr>
+              <tr><td>100008</td><td>Omega Ltd</td><td>€22,100</td><td><span class="badge closed">Completed</span></td></tr>
+              <tr><td>100007</td><td>Beta Corp</td><td>€5,600</td><td><span class="badge blocked">Blocked</span></td></tr>
+              <tr><td>100006</td><td>Gamma SA</td><td>€11,300</td><td><span class="badge process">In Process</span></td></tr>
+            </table>
+          </div>
+          <div class="panel">
+            <div class="panel-title"><i class="ti ti-truck" style="color:var(--text-warning)"></i> Delivery Overview</div>
+            <table class="mini-table">
+              <tr><th>Delivery #</th><th>Material</th><th>Qty</th><th>Planned</th></tr>
+              <tr><td>80000012</td><td>FG-PUMP-01</td><td>50 EA</td><td>01.08.25</td></tr>
+              <tr><td>80000011</td><td>FG-VALVE-02</td><td>200 EA</td><td>31.07.25</td></tr>
+              <tr><td>80000010</td><td>FG-MOTOR-A</td><td>10 EA</td><td>30.07.25</td></tr>
+              <tr><td>80000009</td><td>RAW-STEEL-A</td><td>500 KG</td><td>28.07.25</td></tr>
+              <tr><td>80000008</td><td>FG-CTRL-03</td><td>25 EA</td><td>27.07.25</td></tr>
+            </table>
+          </div>
+        </div>
+        <div style="padding:0 20px 20px">
+          <div class="panel">
+            <div class="panel-title"><i class="ti ti-route" style="color:var(--text-accent)"></i> Order-to-Cash Process Flow</div>
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:8px">
+              <span style="background:var(--bg-accent);color:var(--text-accent);padding:8px 14px;border-radius:var(--radius);font-size:13px;font-weight:500">1. Inquiry</span>
+              <i class="ti ti-arrow-right" style="color:var(--text-muted)"></i>
+              <span style="background:var(--bg-accent);color:var(--text-accent);padding:8px 14px;border-radius:var(--radius);font-size:13px;font-weight:500">2. Quotation</span>
+              <i class="ti ti-arrow-right" style="color:var(--text-muted)"></i>
+              <span style="background:var(--fill-accent);color:#fff;padding:8px 14px;border-radius:var(--radius);font-size:13px;font-weight:500">3. Sales Order</span>
+              <i class="ti ti-arrow-right" style="color:var(--text-muted)"></i>
+              <span style="background:var(--bg-warning);color:var(--text-warning);padding:8px 14px;border-radius:var(--radius);font-size:13px;font-weight:500">4. Delivery</span>
+              <i class="ti ti-arrow-right" style="color:var(--text-muted)"></i>
+              <span style="background:var(--bg-warning);color:var(--text-warning);padding:8px 14px;border-radius:var(--radius);font-size:13px;font-weight:500">5. Goods Issue</span>
+              <i class="ti ti-arrow-right" style="color:var(--text-muted)"></i>
+              <span style="background:var(--bg-success);color:var(--text-success);padding:8px 14px;border-radius:var(--radius);font-size:13px;font-weight:500">6. Billing</span>
+              <i class="ti ti-arrow-right" style="color:var(--text-muted)"></i>
+              <span style="background:var(--bg-success);color:var(--text-success);padding:8px 14px;border-radius:var(--radius);font-size:13px;font-weight:500">7. Payment</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INQUIRY / PRE-SALES -->
+      <div class="content-area" id="area-inquiry">
+        <div class="status-bar">
+          <span>Transaction: <strong>VA11 — Create Inquiry</strong></span>
+          <span>Doc Type: <strong>IN</strong></span>
+          <span>Sales Org: <strong>1000</strong></span>
+          <span>Dist. Channel: <strong>10</strong></span>
+          <span>Division: <strong>00</strong></span>
+        </div>
+        <div class="form-toolbar">
+          <button class="btn primary" onclick="saveDoc('Inquiry','10000001')"><i class="ti ti-check"></i> Save</button>
+          <button class="btn" onclick="showNotif('Inquiry simulated — document not posted')"><i class="ti ti-eye"></i> Check</button>
+          <button class="btn" onclick="switchModule('order')"><i class="ti ti-arrow-right"></i> Create Quotation</button>
+          <div style="flex:1"></div>
+          <button class="btn" onclick="showHelp('inquiry')"><i class="ti ti-info-circle"></i> Help</button>
+        </div>
+        <div class="form-page">
+          <div class="form-section">
+            <div class="form-section-title"><i class="ti ti-building"></i> Header Data</div>
+            <div class="form-grid">
+              <div class="form-field"><label>Sold-to Party *</label><input value="1000" placeholder="Customer #"></div>
+              <div class="form-field"><label>Ship-to Party</label><input value="1000" placeholder="Ship-to #"></div>
+              <div class="form-field"><label>PO Number</label><input placeholder="Customer PO"></div>
+              <div class="form-field"><label>Request Date</label><input type="date" value="2025-08-15"></div>
+              <div class="form-field"><label>Valid From</label><input type="date" value="2025-07-28"></div>
+              <div class="form-field"><label>Valid To</label><input type="date" value="2025-08-28"></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="form-section-title"><i class="ti ti-list"></i> Item Overview</div>
+            <table class="items-table" style="margin:0">
+              <tr><th>#</th><th>Material</th><th>Description</th><th>Quantity</th><th>Unit</th><th>Net Price</th></tr>
+              <tr><td>10</td><td><input value="FG-PUMP-01"></td><td><input value="Industrial Pump A100"></td><td><input value="20" style="width:60px"></td><td><input value="EA" style="width:50px"></td><td><input value="750.00" style="width:80px"></td></tr>
+              <tr><td>20</td><td><input value="FG-VALVE-02"></td><td><input value="Control Valve V200"></td><td><input value="50" style="width:60px"></td><td><input value="EA" style="width:50px"></td><td><input value="120.00" style="width:80px"></td></tr>
+            </table>
+            <div class="amount-row">
+              <span>Net Value: <strong>€21,000.00</strong></span>
+              <span>Tax (19%): <strong>€3,990.00</strong></span>
+              <span class="total">Total: <strong style="color:var(--text-accent)">€24,990.00</strong></span>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="form-section-title"><i class="ti ti-info-circle"></i> SAP SD Concept: Pre-Sales Documents</div>
+            <div style="padding:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+              <div style="background:var(--surface-0);border-radius:var(--radius);padding:12px;border:0.5px solid var(--border)">
+                <div style="font-size:12px;font-weight:500;color:var(--text-accent);margin-bottom:6px"><i class="ti ti-file"></i> Inquiry (VA11)</div>
+                <p style="font-size:12px;color:var(--text-secondary);line-height:1.5">Customer request for price/availability. Non-binding. Creates reference for quotation.</p>
+              </div>
+              <div style="background:var(--surface-0);border-radius:var(--radius);padding:12px;border:0.5px solid var(--border)">
+                <div style="font-size:12px;font-weight:500;color:var(--text-accent);margin-bottom:6px"><i class="ti ti-file-invoice"></i> Quotation (VA21)</div>
+                <p style="font-size:12px;color:var(--text-secondary);line-height:1.5">Binding price offer valid for a period. Can be converted to sales order directly.</p>
+              </div>
+              <div style="background:var(--surface-0);border-radius:var(--radius);padding:12px;border:0.5px solid var(--border)">
+                <div style="font-size:12px;font-weight:500;color:var(--text-accent);margin-bottom:6px"><i class="ti ti-shopping-cart"></i> Sales Order (VA01)</div>
+                <p style="font-size:12px;color:var(--text-secondary);line-height:1.5">Legal commitment. Triggers availability check, credit check, and delivery creation.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SALES ORDER -->
+      <div class="content-area" id="area-order">
+        <div class="status-bar">
+          <span>Transaction: <strong>VA01 — Create Sales Order</strong></span>
+          <span>Doc Type: <strong>OR (Standard Order)</strong></span>
+          <span>Sales Org: <strong>1000</strong></span>
+          <span>Credit Status: <strong style="color:var(--text-success)">OK</strong></span>
+        </div>
+        <div class="form-toolbar">
+          <button class="btn primary" onclick="saveDoc('Sales Order','5000001')"><i class="ti ti-check"></i> Save</button>
+          <button class="btn" onclick="showNotif('Availability check: All items confirmed')"><i class="ti ti-package"></i> ATP Check</button>
+          <button class="btn" onclick="switchModule('delivery')"><i class="ti ti-truck"></i> Create Delivery</button>
+          <button class="btn" onclick="showConditions()"><i class="ti ti-tag"></i> Pricing</button>
+          <div style="flex:1"></div>
+          <button class="btn" onclick="showHelp('order')"><i class="ti ti-info-circle"></i> Help</button>
+        </div>
+        <div class="form-page">
+          <div class="form-section">
+            <div class="form-section-title"><i class="ti ti-building"></i> Header — Partner Functions</div>
+            <div class="form-grid">
+              <div class="form-field"><label>Sold-to Party (AG) *</label><input value="1000" placeholder="Customer #"></div>
+              <div class="form-field"><label>Ship-to Party (WE)</label><input value="1001" placeholder="Ship-to #"></div>
+              <div class="form-field"><label>Bill-to Party (RE)</label><input value="1000" placeholder="Bill-to #"></div>
+              <div class="form-field"><label>Payer (RG)</label><input value="1000" placeholder="Payer #"></div>
+              <div class="form-field"><label>Customer PO</label><input value="PO-2025-0842"></div>
+              <div class="form-field"><label>PO Date</label><input type="date" value="2025-07-25"></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="form-section-title"><i class="ti ti-settings-2"></i> Header — Shipping & Schedule</div>
+            <div class="form-grid">
+              <div class="form-field"><label>Requested Delivery</label><input type="date" value="2025-08-10"></div>
+              <div class="form-field"><label>Shipping Conditions</label><select><option>01 — Standard</option><option>02 — Express</option><option>03 — As fast as possible</option></select></div>
+              <div class="form-field"><label>Incoterms</label><select><option>DDP — Delivered Duty Paid</option><option>EXW — Ex Works</option><option>FOB — Free on Board</option><option>CIF — Cost Insurance Freight</option></select></div>
+              <div class="form-field"><label>Payment Terms</label><select><option>NT30 — Net 30 Days</option><option>NT14 — Net 14 Days</option><option>2/10NT30 — 2% 10 Net 30</option></select></div>
+              <div class="form-field"><label>Shipping Point</label><input value="1000"></div>
+              <div class="form-field"><label>Route</label><input value="R0001 — Road DE-EU"></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="form-section-title"><i class="ti ti-list"></i> Item Overview</div>
+            <table class="items-table">
+              <tr><th>#</th><th>Material</th><th>Description</th><th>Order Qty</th><th>UoM</th><th>Conf. Qty</th><th>Net Price</th><th>Item Cat.</th><th>Schedule</th></tr>
+              <tr><td>10</td><td><input value="FG-PUMP-01"></td><td><input value="Industrial Pump A100"></td><td><input value="20" style="width:55px"></td><td><input value="EA" style="width:40px"></td><td style="color:var(--text-success)">20</td><td><input value="750.00" style="width:70px"></td><td><input value="TAN" style="width:50px"></td><td style="color:var(--text-success)">10.08.25</td></tr>
+              <tr><td>20</td><td><input value="FG-VALVE-02"></td><td><input value="Control Valve V200"></td><td><input value="50" style="width:55px"></td><td><input value="EA" style="width:40px"></td><td style="color:var(--text-warning)">30</td><td><input value="120.00" style="width:70px"></td><td><input value="TAN" style="width:50px"></td><td style="color:var(--text-warning)">15.08.25</td></tr>
+              <tr><td>30</td><td><input value="FG-MOTOR-A"></td><td><input value="Electric Motor 5kW"></td><td><input value="5" style="width:55px"></td><td><input value="EA" style="width:40px"></td><td style="color:var(--text-success)">5</td><td><input value="1,200.00" style="width:70px"></td><td><input value="TAN" style="width:50px"></td><td style="color:var(--text-success)">08.08.25</td></tr>
+            </table>
+            <div class="amount-row">
+              <span>Net Value: <strong>€27,000.00</strong></span>
+              <span>Tax (19%): <strong>€5,130.00</strong></span>
+              <span class="total">Total: <strong style="color:var(--text-accent)">€32,130.00</strong></span>
+            </div>
+          </div>
+          <div id="condPanel" style="display:none" class="form-section">
+            <div class="form-section-title"><i class="ti ti-tag"></i> Pricing Conditions (Item 10 — FG-PUMP-01)</div>
+            <table class="cond-table">
+              <tr><th>Step</th><th>Cond. Type</th><th>Description</th><th>Amount</th><th>%</th><th>Value</th></tr>
+              <tr><td>10</td><td>PR00</td><td>Gross Price (Price List)</td><td>800.00 EUR</td><td></td><td>16,000.00</td></tr>
+              <tr><td>20</td><td>K004</td><td>Material Discount</td><td></td><td>-5.00%</td><td>-800.00</td></tr>
+              <tr><td>30</td><td>K005</td><td>Customer Discount</td><td></td><td>-2.50%</td><td>-400.00</td></tr>
+              <tr class="subtotal"><td></td><td></td><td>Net Value</td><td></td><td></td><td>14,800.00</td></tr>
+              <tr><td>40</td><td>MWST</td><td>Output Tax (19%)</td><td></td><td>19.00%</td><td>2,812.00</td></tr>
+              <tr class="total"><td></td><td></td><td>Total Amount</td><td></td><td></td><td>17,612.00 EUR</td></tr>
+            </table>
+            <div style="padding:10px 12px;font-size:12px;color:var(--text-muted)">Pricing Procedure: RVAA01 | Access Sequence: PR00 → Customer/Material → Material</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DELIVERY -->
+      <div class="content-area" id="area-delivery">
+        <div class="status-bar">
+          <span>Transaction: <strong>VL01N — Create Outbound Delivery</strong></span>
+          <span>Ref. Order: <strong>5000001</strong></span>
+          <span>Shipping Point: <strong>1000</strong></span>
+          <span>WM Active: <strong>Yes</strong></span>
+        </div>
+        <div class="form-toolbar">
+          <button class="btn primary" onclick="saveDoc('Delivery','80000013')"><i class="ti ti-check"></i> Save</button>
+          <button class="btn" onclick="showNotif('Picking list created — LT0A posted')"><i class="ti ti-package"></i> Create Transfer Order</button>
+          <button class="btn" onclick="showNotif('Goods Issue posted — 100 items moved from unrestricted stock')"><i class="ti ti-arrow-up"></i> Post Goods Issue</button>
+          <button class="btn" onclick="showNotif('Packing proposal created')"><i class="ti ti-package-export"></i> Pack</button>
+          <div style="flex:1"></div>
+          <button class="btn" onclick="switchModule('billing')"><i class="ti ti-receipt"></i> Create Invoice</button>
+        </div>
+        <div class="form-page">
+          <div class="form-section">
+            <div class="form-section-title"><i class="ti ti-truck"></i> Delivery Header</div>
+            <div class="form-grid">
+              <div class="form-field"><label>Ship-to Party</label><input value="1001 — ACME GmbH Warehouse"></div>
+              <div class="form-field"><label>Planned GI Date</label><input type="date" value="2025-08-08"></div>
+              <div class="form-field"><label>Delivery Date</label><input type="date" value="2025-08-10"></div>
+              <div class="form-field"><label>Shipping Point</label><input value="1000 — Main Shipping Point"></div>
+              <div class="form-field"><label>Route</label><input value="R0001 — Road DE-EU"></div>
+              <div class="form-field"><label>Shipping Condition</label><input value="01 — Standard"></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="form-section-title"><i class="ti ti-list"></i> Delivery Items — Picking</div>
+            <table class="items-table">
+              <tr><th>#</th><th>Material</th><th>Delivery Qty</th><th>Picked Qty</th><th>UoM</th><th>Storage Loc.</th><th>Batch</th><th>Status</th></tr>
+              <tr><td>10</td><td>FG-PUMP-01</td><td>20</td><td><input value="20" style="width:55px"></td><td>EA</td><td><input value="0001" style="width:55px"></td><td>B2025-07</td><td><span class="badge open">Picked</span></td></tr>
+              <tr><td>20</td><td>FG-MOTOR-A</td><td>5</td><td><input value="5" style="width:55px"></td><td>EA</td><td><input value="0001" style="width:55px"></td><td>B2025-06</td><td><span class="badge process">Partial</span></td></tr>
+            </table>
+          </div>
+          <div class="form-section">
+            <div class="form-section-title"><i class="ti ti-info-circle"></i> Key Concepts: Shipping</div>
+            <div style="padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div style="background:var(--surface-0);border-radius:var(--radius);padding:12px;border:0.5px solid var(--border)">
+                <div style="font-size:12px;font-weight:500;color:var(--text-accent);margin-bottom:6px">Delivery Processing Steps</div>
+                <p style="font-size:12px;color:var(--text-secondary);line-height:1.8">1. Create Delivery (VL01N)<br>2. Pick Materials (LT0A)<br>3. Pack (optional) (VL02N)<br>4. Post Goods Issue (VL02N → PGI)<br>5. Print Shipping Docs</p>
+              </div>
+              <div style="background:var(--surface-0);border-radius:var(--radius);padding:12px;border:0.5px solid var(--border)">
+                <div style="font-size:12px;font-weight:500;color:var(--text-warning);margin-bottom:6px">Goods Issue Impact</div>
+                <p style="font-size:12px;color:var(--text-secondary);line-height:1.8">• Stock reduced in WM/IM<br>• Movement type 601 posted<br>• COGS recognized (MM/CO)<br>• Billing relevance set<br>• Delivery becomes non-reversible</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BILLING -->
+      <div class="content-area" id="area-billing">
+        <div class="status-bar">
+          <span>Transaction: <strong>VF01 — Create Billing Document</strong></span>
+          <span>Billing Type: <strong>F2 (Invoice)</strong></span>
+          <span>Ref. Delivery: <strong>80000013</strong></span>
+          <span>FI Transfer: <strong>Automatic</strong></span>
+        </div>
+        <div class="form-toolbar">
+          <button class="btn primary" onclick="saveDoc('Invoice','9000001')"><i class="ti ti-check"></i> Post Invoice</button>
+          <button class="btn" onclick="showNotif('Invoice output sent to customer via email')"><i class="ti ti-mail"></i> Output / Print</button>
+          <button class="btn" onclick="showNotif('FI document: Dr. AR 32,130 / Cr. Revenue 27,000 / Cr. Tax 5,130')"><i class="ti ti-arrows-transfer-up"></i> FI Transfer</button>
+          <button class="btn" onclick="showNotif('Credit memo request created')"><i class="ti ti-file-minus"></i> Credit Memo</button>
+        </div>
+        <div class="form-page">
+          <div class="form-section">
+            <div class="form-section-title"><i class="ti ti-receipt"></i> Billing Document Header</div>
+            <div class="form-grid">
+              <div class="form-field"><label>Payer</label><input value="1000 — ACME GmbH"></div>
+              <div class="form-field"><label>Billing Date</label><input type="date" value="2025-08-12"></div>
+              <div class="form-field"><label>Payment Terms</label><input value="NT30 — Net 30 Days"></div>
+              <div class="form-field"><label>Due Date</label><input type="date" value="2025-09-11"></div>
+              <div class="form-field"><label>Tax Departure</label><input value="DE — Germany"></div>
+              <div class="form-field"><label>Tax Destination</label><input value="DE — Germany"></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="form-section-title"><i class="ti ti-list"></i> Invoice Line Items</div>
+            <table class="items-table">
+              <tr><th>#</th><th>Material</th><th>Description</th><th>Qty</th><th>UoM</th><th>Unit Price</th><th>Net Amount</th><th>Tax</th><th>Gross</th></tr>
+              <tr><td>10</td><td>FG-PUMP-01</td><td>Industrial Pump A100</td><td>20</td><td>EA</td><td>750.00</td><td>15,000.00</td><td>2,850.00</td><td>17,850.00</td></tr>
+              <tr><td>20</td><td>FG-MOTOR-A</td><td>Electric Motor 5kW</td><td>5</td><td>EA</td><td>1,200.00</td><td>6,000.00</td><td>1,140.00</td><td>7,140.00</td></tr>
+            </table>
+            <div class="amount-row">
+              <span>Net: <strong>€21,000.00</strong></span>
+              <span>Tax (19%): <strong>€3,990.00</strong></span>
+              <span class="total">Invoice Total: <strong style="color:var(--text-success)">€24,990.00</strong></span>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="form-section-title"><i class="ti ti-transfer"></i> FI Accounting Entry (Auto-Generated)</div>
+            <div style="padding:14px;font-family:var(--font-mono);font-size:12px;background:var(--surface-0);margin:0 14px 14px;border-radius:var(--radius);border:0.5px solid var(--border)">
+              <div style="color:var(--text-muted);margin-bottom:6px"># FI Document 100000001 | Company Code 1000 | 12.08.2025</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;color:var(--text-secondary)">
+                <div style="color:var(--text-muted)">PK</div><div style="color:var(--text-muted)">GL Account</div><div style="color:var(--text-muted)">Description</div><div style="color:var(--text-muted)">Amount</div>
+                <div>01</div><div>140000</div><div>Accounts Receivable</div><div style="color:var(--text-success)">+ 24,990.00 EUR</div>
+                <div>50</div><div>800000</div><div>Revenue — Finished Goods</div><div style="color:var(--text-danger)">- 21,000.00 EUR</div>
+                <div>50</div><div>175000</div><div>Output Tax (MwSt 19%)</div><div style="color:var(--text-danger)">- 3,990.00 EUR</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRICING -->
+      <div class="content-area" id="area-pricing">
+        <div class="status-bar">
+          <span>Transaction: <strong>VK11 — Create Condition Records</strong></span>
+          <span>Pricing Procedure: <strong>RVAA01</strong></span>
+          <span>Condition Type: <strong>PR00 — Price</strong></span>
+        </div>
+        <div class="form-toolbar">
+          <button class="btn primary" onclick="saveDoc('Condition Record','PR00-2025-001')"><i class="ti ti-check"></i> Save</button>
+          <button class="btn"><i class="ti ti-copy"></i> Copy</button>
+        </div>
+        <div class="form-page">
+          <div class="form-section">
+            <div class="form-section-title"><i class="ti ti-tag"></i> Condition Types & Access Sequences</div>
+            <div style="padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div>
+                <div style="font-size:12px;font-weight:500;margin-bottom:8px;color:var(--text-primary)">Pricing Procedure RVAA01</div>
+                <table class="cond-table">
+                  <tr><th>Step</th><th>Type</th><th>Description</th><th>Calc.</th></tr>
+                  <tr><td>10</td><td>PR00</td><td>Gross Price</td><td>Base</td></tr>
+                  <tr><td>20</td><td>K004</td><td>Material Discount</td><td>%</td></tr>
+                  <tr><td>30</td><td>K005</td><td>Customer Discount</td><td>%</td></tr>
+                  <tr><td>40</td><td>K007</td><td>Customer Group Disc.</td><td>%</td></tr>
+                  <tr><td>50</td><td>KF00</td><td>Freight</td><td>Fixed</td></tr>
+                  <tr><td>60</td><td>MWST</td><td>Output Tax</td><td>%</td></tr>
+                </table>
+              </div>
+              <div>
+                <div style="font-size:12px;font-weight:500;margin-bottom:8px;color:var(--text-primary)">Condition Records — PR00 Price List</div>
+                <table class="cond-table">
+                  <tr><th>Customer</th><th>Material</th><th>Price</th><th>Valid From</th><th>Valid To</th></tr>
+                  <tr><td>1000</td><td>FG-PUMP-01</td><td>800.00 EUR</td><td>01.01.25</td><td>31.12.25</td></tr>
+                  <tr><td>1000</td><td>FG-VALVE-02</td><td>130.00 EUR</td><td>01.01.25</td><td>31.12.25</td></tr>
+                  <tr><td>1001</td><td>FG-PUMP-01</td><td>750.00 EUR</td><td>01.03.25</td><td>31.12.25</td></tr>
+                  <tr><td></td><td>FG-MOTOR-A</td><td>1,250.00 EUR</td><td>01.01.25</td><td>31.12.25</td></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="form-section-title"><i class="ti ti-info-circle"></i> Pricing Concept Explained</div>
+            <div style="padding:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+              <div style="background:var(--bg-accent);border-radius:var(--radius);padding:12px">
+                <div style="font-size:12px;font-weight:500;color:var(--text-accent);margin-bottom:6px">Condition Type</div>
+                <p style="font-size:12px;color:var(--text-secondary);line-height:1.5">Defines how a price element behaves — is it a price, discount, surcharge, or tax? Each has a calculation type and sign (+/-).</p>
+              </div>
+              <div style="background:var(--bg-warning);border-radius:var(--radius);padding:12px">
+                <div style="font-size:12px;font-weight:500;color:var(--text-warning);margin-bottom:6px">Access Sequence</div>
+                <p style="font-size:12px;color:var(--text-secondary);line-height:1.5">The search strategy: SAP looks up condition records from most-specific to least-specific (e.g. Customer+Material → Customer → Material).</p>
+              </div>
+              <div style="background:var(--bg-success);border-radius:var(--radius);padding:12px">
+                <div style="font-size:12px;font-weight:500;color:var(--text-success);margin-bottom:6px">Pricing Procedure</div>
+                <p style="font-size:12px;color:var(--text-secondary);line-height:1.5">The sequence of condition types applied in order. Determined by Sales Org + Customer Pricing Procedure + Doc. Pricing Procedure.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARTNER FUNCTIONS -->
+      <div class="content-area" id="area-partner">
+        <div class="status-bar">
+          <span>Transaction: <strong>VOV8 / VOPA — Partner Functions</strong></span>
+        </div>
+        <div class="form-page" style="padding-top:0">
+          <div class="dash-header">
+            <div class="dash-title">Partner Functions in SAP SD</div>
+            <div class="dash-sub">Defines the roles different business partners play in a sales transaction</div>
+          </div>
+          <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="panel">
+              <div class="panel-title"><i class="ti ti-users" style="color:var(--text-accent)"></i> Standard Partner Functions</div>
+              <table class="mini-table" style="margin-top:4px">
+                <tr><th>Code</th><th>Function</th><th>Description</th><th>Unique?</th></tr>
+                <tr><td><strong>AG</strong></td><td>Sold-to Party</td><td>Who places the order</td><td>Yes</td></tr>
+                <tr><td><strong>WE</strong></td><td>Ship-to Party</td><td>Where goods are delivered</td><td>No</td></tr>
+                <tr><td><strong>RE</strong></td><td>Bill-to Party</td><td>Who receives the invoice</td><td>No</td></tr>
+                <tr><td><strong>RG</strong></td><td>Payer</td><td>Who pays the invoice</td><td>No</td></tr>
+                <tr><td><strong>VE</strong></td><td>Sales Employee</td><td>Responsible sales person</td><td>No</td></tr>
+                <tr><td><strong>SP</strong></td><td>Sales Contact</td><td>Contact at customer</td><td>No</td></tr>
+              </table>
+            </div>
+            <div class="panel">
+              <div class="panel-title"><i class="ti ti-sitemap" style="color:var(--text-warning)"></i> Partner Determination</div>
+              <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:10px">Partners are determined automatically from Customer Master partner functions. The sold-to party drives default ship-to, bill-to, and payer unless overridden.</p>
+              <div style="background:var(--surface-0);border-radius:var(--radius);padding:10px;border:0.5px solid var(--border)">
+                <div style="font-size:12px;font-weight:500;margin-bottom:6px;color:var(--text-primary)">Example: Corporate Group Structure</div>
+                <div style="font-size:12px;color:var(--text-secondary);line-height:1.8">
+                  AG: ACME Headquarters (places orders)<br>
+                  WE: ACME Warehouse Berlin (receives goods)<br>
+                  RE: ACME Finance Dept (receives invoice)<br>
+                  RG: ACME Treasury (makes payment)
+                </div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-title"><i class="ti ti-building-bank" style="color:var(--text-success)"></i> Customer Account Groups</div>
+              <table class="mini-table" style="margin-top:4px">
+                <tr><th>Group</th><th>Description</th><th>Number Range</th></tr>
+                <tr><td>0001</td><td>Sold-to Party</td><td>1000–1999</td></tr>
+                <tr><td>0002</td><td>Ship-to Party</td><td>2000–2999</td></tr>
+                <tr><td>0003</td><td>Payer</td><td>3000–3999</td></tr>
+                <tr><td>0004</td><td>Bill-to Party</td><td>4000–4999</td></tr>
+                <tr><td>KUNA</td><td>One-time Customer</td><td>CPD Account</td></tr>
+              </table>
+            </div>
+            <div class="panel">
+              <div class="panel-title"><i class="ti ti-clipboard-list" style="color:var(--text-accent)"></i> Customer Master Views</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:4px">
+                <div style="background:var(--surface-0);border-radius:var(--radius);padding:8px;border:0.5px solid var(--border);font-size:12px">
+                  <div style="font-weight:500;color:var(--text-primary)">General Data</div>
+                  <div style="color:var(--text-muted)">Name, address, language, tax number</div>
+                </div>
+                <div style="background:var(--surface-0);border-radius:var(--radius);padding:8px;border:0.5px solid var(--border);font-size:12px">
+                  <div style="font-weight:500;color:var(--text-primary)">Company Code</div>
+                  <div style="color:var(--text-muted)">Payment terms, dunning, reconciliation account</div>
+                </div>
+                <div style="background:var(--surface-0);border-radius:var(--radius);padding:8px;border:0.5px solid var(--border);font-size:12px">
+                  <div style="font-weight:500;color:var(--text-primary)">Sales Area</div>
+                  <div style="color:var(--text-muted)">Pricing procedure, shipping, incoterms, sales district</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CREDIT MANAGEMENT -->
+      <div class="content-area" id="area-credit">
+        <div class="status-bar">
+          <span>Transaction: <strong>FD32 — Customer Credit Master / VKM1 — Blocked Orders</strong></span>
+        </div>
+        <div class="form-page" style="padding-top:0">
+          <div class="dash-header">
+            <div class="dash-title">Credit Management</div>
+            <div class="dash-sub">Monitor and control customer credit exposure in real time</div>
+          </div>
+          <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="panel">
+              <div class="panel-title"><i class="ti ti-shield-check" style="color:var(--text-success)"></i> Customer Credit Master — 1000 (ACME GmbH)</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+                <div>
+                  <div style="font-size:11px;color:var(--text-muted)">Credit Limit</div>
+                  <div style="font-size:18px;font-weight:500">€500,000</div>
+                </div>
+                <div>
+                  <div style="font-size:11px;color:var(--text-muted)">Current Exposure</div>
+                  <div style="font-size:18px;font-weight:500;color:var(--text-warning)">€387,450</div>
+                </div>
+                <div>
+                  <div style="font-size:11px;color:var(--text-muted)">Available Credit</div>
+                  <div style="font-size:18px;font-weight:500;color:var(--text-success)">€112,550</div>
+                </div>
+                <div>
+                  <div style="font-size:11px;color:var(--text-muted)">Utilization</div>
+                  <div style="font-size:18px;font-weight:500;color:var(--text-warning)">77.5%</div>
+                </div>
+              </div>
+              <div style="margin-top:12px;background:var(--surface-0);border-radius:var(--radius);overflow:hidden;height:12px;border:0.5px solid var(--border)">
+                <div style="width:77.5%;height:100%;background:var(--fill-warning)"></div>
+              </div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:6px">77.5% of credit limit used — warning threshold: 80%</div>
+            </div>
+            <div class="panel">
+              <div class="panel-title"><i class="ti ti-lock" style="color:var(--text-danger)"></i> Credit Blocked Orders (VKM1)</div>
+              <table class="mini-table" style="margin-top:4px">
+                <tr><th>Order #</th><th>Customer</th><th>Value</th><th>Reason</th><th>Action</th></tr>
+                <tr><td>5000007</td><td>Beta Corp</td><td>€68,000</td><td>Limit exceeded</td><td><button class="btn" style="padding:2px 8px;font-size:11px" onclick="showNotif('Order 5000007 released by credit manager')">Release</button></td></tr>
+                <tr><td>5000010</td><td>Gamma SA</td><td>€12,400</td><td>Overdue items</td><td><button class="btn" style="padding:2px 8px;font-size:11px" onclick="showNotif('Order 5000010 released')">Release</button></td></tr>
+              </table>
+            </div>
+            <div class="panel" style="grid-column:span 2">
+              <div class="panel-title"><i class="ti ti-info-circle" style="color:var(--text-accent)"></i> Credit Check Types in SAP SD</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-top:4px">
+                <div style="background:var(--surface-0);border-radius:var(--radius);padding:10px;border:0.5px solid var(--border)">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary)">Static Check</div>
+                  <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin-top:4px">Compares all open items (orders + deliveries + invoices) against credit limit</p>
+                </div>
+                <div style="background:var(--surface-0);border-radius:var(--radius);padding:10px;border:0.5px solid var(--border)">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary)">Dynamic Check</div>
+                  <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin-top:4px">Adds expected future orders within a horizon period to the exposure calculation</p>
+                </div>
+                <div style="background:var(--surface-0);border-radius:var(--radius);padding:10px;border:0.5px solid var(--border)">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary)">Oldest Open Item</div>
+                  <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin-top:4px">Blocks order if customer has overdue items older than a specified number of days</p>
+                </div>
+                <div style="background:var(--surface-0);border-radius:var(--radius);padding:10px;border:0.5px solid var(--border)">
+                  <div style="font-size:12px;font-weight:500;color:var(--text-primary)">Maximum Dunning</div>
+                  <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin-top:4px">Blocks if customer dunning level exceeds a configured maximum level</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONFIG -->
+      <div class="content-area" id="area-config">
+        <div class="status-bar">
+          <span>Transaction: <strong>SPRO — IMG (Implementation Guide)</strong></span>
+          <span>Module: <strong>Sales & Distribution</strong></span>
+        </div>
+        <div class="form-page" style="padding-top:0">
+          <div class="dash-header">
+            <div class="dash-title">SAP SD Configuration — Enterprise Structure</div>
+            <div class="dash-sub">Key organizational units that control SD processes</div>
+          </div>
+          <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="panel">
+              <div class="panel-title"><i class="ti ti-building-factory-2" style="color:var(--text-accent)"></i> Sales Organization Structure</div>
+              <div style="font-family:var(--font-mono);font-size:12px;padding:10px;background:var(--surface-0);border-radius:var(--radius);line-height:2;color:var(--text-secondary)">
+                <div style="color:var(--text-accent);font-weight:500">Client 100</div>
+                <div style="padding-left:16px">└─ <span style="color:var(--text-primary)">Company Code 1000</span> (Germany)</div>
+                <div style="padding-left:32px">└─ <span style="color:var(--text-primary)">Sales Org 1000</span> (Germany Sales)</div>
+                <div style="padding-left:48px">├─ <span style="color:var(--text-warning)">Dist. Channel 10</span> (Direct)</div>
+                <div style="padding-left:64px">└─ <span style="color:var(--text-success)">Division 00</span> (Cross-Division)</div>
+                <div style="padding-left:48px">└─ <span style="color:var(--text-warning)">Dist. Channel 20</span> (Retail)</div>
+                <div style="padding-left:32px">└─ <span style="color:var(--text-primary)">Sales Org 2000</span> (Export)</div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-title"><i class="ti ti-file-settings" style="color:var(--text-warning)"></i> Sales Document Types (VOV8)</div>
+              <table class="mini-table" style="margin-top:4px">
+                <tr><th>Type</th><th>Description</th><th>Category</th></tr>
+                <tr><td>IN</td><td>Inquiry</td><td>Pre-Sales</td></tr>
+                <tr><td>QT</td><td>Quotation</td><td>Pre-Sales</td></tr>
+                <tr><td>OR</td><td>Standard Order</td><td>Sales</td></tr>
+                <tr><td>RO</td><td>Rush Order</td><td>Sales</td></tr>
+                <tr><td>CR</td><td>Credit Memo Request</td><td>Returns</td></tr>
+                <tr><td>DR</td><td>Debit Memo Request</td><td>Billing</td></tr>
+                <tr><td>RE</td><td>Returns</td><td>Returns</td></tr>
+              </table>
+            </div>
+            <div class="panel">
+              <div class="panel-title"><i class="ti ti-list-details" style="color:var(--text-success)"></i> Item Categories (VOV7)</div>
+              <table class="mini-table" style="margin-top:4px">
+                <tr><th>Category</th><th>Description</th><th>Relevant</th></tr>
+                <tr><td>TAN</td><td>Standard Item</td><td>Delivery + Billing</td></tr>
+                <tr><td>TAD</td><td>Service Item</td><td>Billing only</td></tr>
+                <tr><td>TAB</td><td>Individual PO</td><td>Delivery</td></tr>
+                <tr><td>TANN</td><td>Free-of-charge</td><td>Delivery, no billing</td></tr>
+                <tr><td>TAX</td><td>Text Item</td><td>None</td></tr>
+              </table>
+            </div>
+            <div class="panel">
+              <div class="panel-title"><i class="ti ti-arrows-transfer-down" style="color:var(--text-accent)"></i> Copy Control (VTAA/VTLA/VTFA)</div>
+              <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin-bottom:10px">Defines how data flows between documents (e.g. Quotation → Sales Order).</p>
+              <table class="mini-table">
+                <tr><th>From</th><th>To</th><th>T-Code</th></tr>
+                <tr><td>Sales → Sales</td><td>QT → OR</td><td>VTAA</td></tr>
+                <tr><td>Sales → Delivery</td><td>OR → LF</td><td>VTLA</td></tr>
+                <tr><td>Delivery → Billing</td><td>LF → F2</td><td>VTLA</td></tr>
+                <tr><td>Sales → Billing</td><td>OR → F2</td><td>VTFA</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="notif" id="notif"><i class="ti ti-check"></i> <span id="notif-text"></span></div>
+
+<script>
+var currentModule = 'dashboard';
+var areas = ['dashboard','inquiry','order','delivery','billing','pricing','partner','credit','config'];
+
+function switchModule(mod) {
+  currentModule = mod;
+  areas.forEach(function(a) {
+    var el = document.getElementById('area-' + a);
+    if (el) el.classList.toggle('active', a === mod);
+  });
+  document.querySelectorAll('.nav-item').forEach(function(el, i) {
+    var mods = ['dashboard','inquiry','order','delivery','billing','pricing','partner','credit','config'];
+    el.classList.toggle('active', mods[i] === mod);
+  });
+  var sideItems = document.querySelectorAll('.sidebar-item');
+  sideItems.forEach(function(el) { el.classList.remove('active'); });
+}
+
+function gotoSection(sec) {
+  var map = {customer:'partner', material:'config', pricing:'pricing', quotation:'inquiry', report:'order', backlog:'order'};
+  if (map[sec]) switchModule(map[sec]);
+}
+
+function saveDoc(type, num) {
+  showNotif(type + ' ' + num + ' saved successfully');
+}
+
+function showNotif(msg) {
+  var n = document.getElementById('notif');
+  document.getElementById('notif-text').textContent = msg;
+  n.classList.add('show');
+  setTimeout(function() { n.classList.remove('show'); }, 3000);
+}
+
+function showConditions() {
+  var p = document.getElementById('condPanel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
+
+function showHelp(ctx) {
+  var msgs = {
+    inquiry: 'VA11: Create Inquiry | VA12: Change | VA13: Display | Use F4 for search helps',
+    order: 'VA01: Create | VA02: Change | VA03: Display | VA05: List of Sales Orders | VKM1: Credit blocked'
+  };
+  showNotif(msgs[ctx] || 'Use F1 on any field for field-level help');
+}
+</script>
